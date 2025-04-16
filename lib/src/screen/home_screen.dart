@@ -5,6 +5,7 @@ import 'package:nations_app/src/widgets/build_body.dart';
 import 'package:nations_app/src/widgets/route_observer.dart';
 import 'package:nations_app/src/widgets/shimmer_effect.dart';
 import 'package:nations_app/src/widgets/show_bottom_modal.dart';
+import 'package:nations_app/src/widgets/text_field_widget.dart';
 import 'package:nations_app/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -139,7 +140,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   void initState() {
     super.initState();
-    loadCountries();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadCountries();
+    });
   }
 
   // LOGIC FOR ENSURING THE FULL COUNTRIES LIST SHOWS WHEN THE USER TAPS THE BACK BUTTON FROM THE COUNTRY INFO SCREEN
@@ -190,56 +193,46 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           ],
         ),
       ),
-      body: apiError ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.wifi_off, color: Colors.red, size: 48),
-            SizedBox(height: 12),
-            Text('Unable to fetch countries.\nCheck your internet connection.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: (){
-                CircularProgressIndicator();
-                loadCountries();
-              },
-              child: Text('Retry'),
-            ),
-          ],
-        ),
-      ):
-          _isLoading
+      body:
+          apiError
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.wifi_off, color: Colors.red, size: 48),
+                    SizedBox(height: 12),
+                    Text(
+                      'Unable to fetch countries.\nCheck your internet connection.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Theme.of(context).cardColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      onPressed: () {
+                        CircularProgressIndicator();
+                        loadCountries();
+                      },
+                      child: Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+              : _isLoading
               ? ShimmerEffect()
               : Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
                     // SEARCH FIELD
-                    TextField(
-                      controller: _searchController,
+                    TextFieldWidget(
+                      searchController: _searchController,
                       onChanged: (value) => searchCountries(query: value),
-                      onSubmitted: (value) => searchCountries(query: value),
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).cardColor,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                          ),
-                        ),
-                        fillColor: Theme.of(context).cardColor,
-                        filled: true,
-                        prefixIcon: Icon(Icons.search),
-                        hintText: '           Search Country',
-                      ),
                     ),
                     SizedBox(height: 10),
                     Row(

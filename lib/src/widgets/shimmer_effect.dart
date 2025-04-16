@@ -64,7 +64,7 @@ class ShimmerEffect extends StatelessWidget {
           SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: 16,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -97,7 +97,7 @@ class ShimmerEffect extends StatelessWidget {
                                 height: 10,
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(2),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
                             ),
@@ -113,7 +113,7 @@ class ShimmerEffect extends StatelessWidget {
                                 height: 10,
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(2),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
                             ),

@@ -99,7 +99,7 @@ class ShowBottomModal extends StatelessWidget {
     );
   }
 
-// TRIGGER BUTTON TO SHOW BOTTOM MODAL
+  // TRIGGER BUTTON TO SHOW BOTTOM MODAL
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,7 +238,8 @@ class ShowBottomModal extends StatelessWidget {
         ) ??
         0;
   }
-// FILTERING FOR LAND MASS SIZE IN SQUARE KILOMETERS
+
+  // FILTERING FOR LAND MASS SIZE IN SQUARE KILOMETERS
   void _showSizesModal(
     BuildContext context,
     void Function(Map<String, String> sizeRange)? onSizeRangeSelected,
