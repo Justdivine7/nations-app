@@ -11,7 +11,7 @@ class CountryController {
 
     final countryJson = data['data'];
     List<Country> countriesList = [];
-    Set<String> continents = {};
+   
 
     for (Map<String, dynamic> country in countryJson) {
       countriesList.add(Country.fromJson(country));
@@ -28,11 +28,9 @@ class CountryController {
         groupedCountries[firstLetter] = [];
       }
       groupedCountries[firstLetter]!.add(country);
-      continents.add(country.continent);
+    
     }
-    List<String> continentList = continents.toList()..sort();
-
-    print(continentList);
+    
 
     return groupedCountries;
   }

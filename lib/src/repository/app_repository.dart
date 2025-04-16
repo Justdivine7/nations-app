@@ -10,7 +10,9 @@ class CountryRepo {
         'Authorization': 'Bearer $token',
       };
       final response = await http.get(url, headers: headers);
-      // print(response.body);
+      if(response.statusCode != 200){
+        throw Exception('Failed to load countries: ${response.statusCode}');
+      }
 
       return response;
     } catch (e) {

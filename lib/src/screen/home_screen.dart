@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Map<String, List<Country>> _filteredCountries = {};
   bool _isLoading = false;
   bool invalidSearchResult = false;
+  bool apiError = false;
 
   // SEARCH LOGIC
 
@@ -116,16 +117,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   // LOADING COUNTRIES FROM CONTROLLER
   void loadCountries() async {
-    setState(() {
-      _isLoading = true;
-    });
+    try {
+      setState(() {
+        _isLoading = true;
+      });
 
-    final result = await controller.getCountries();
-    setState(() {
-      _allCountries = result;
-      _filteredCountries = result;
-      _isLoading = false;
-    });
+      final result = await controller.getCountries();
+      setState(() {
+        _allCountries = result;
+        _filteredCountries = result;
+        _isLoading = false;
+        apiError = false;
+      });
+    } catch (e) {
+      setState(() {
+        apiError = true;
+      });
+    }
   }
 
   @override
@@ -182,7 +190,27 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           ],
         ),
       ),
-      body:
+      body: apiError ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.wifi_off, color: Colors.red, size: 48),
+            SizedBox(height: 12),
+            Text('Unable to fetch countries.\nCheck your internet connection.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: (){
+                CircularProgressIndicator();
+                loadCountries();
+              },
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      ):
           _isLoading
               ? ShimmerEffect()
               : Padding(
@@ -245,20 +273,20 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     ),
                     SizedBox(height: 10),
 
-                    if (_isLoading)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: LinearProgressIndicator(),
+                    // if (_isLoading)
+                    //   Padding(
+                    //     padding: EdgeInsets.symmetric(vertical: 10),
+                    //     child: LinearProgressIndicator(),
+                    //   ),
+                    // if (!_isLoading)
+                    // THE COUNTRIES LIST MAIN BODY
+                    Expanded(
+                      child: BuildBody(
+                        filteredCountries: _filteredCountries,
+                        invalidSearchResult: invalidSearchResult,
+                        searchController: _searchController,
                       ),
-                    if (!_isLoading)
-                      // THE COUNTRIES LIST MAIN BODY
-                      Expanded(
-                        child: BuildBody(
-                          filteredCountries: _filteredCountries,
-                          invalidSearchResult: invalidSearchResult,
-                          searchController: _searchController,
-                        ),
-                      ),
+                    ),
                   ],
                 ),
               ),
