@@ -3,7 +3,10 @@ import 'package:nations_app/src/controller/app_controller.dart';
 import 'package:nations_app/src/model/app_model.dart';
 import 'package:nations_app/src/widgets/build_body.dart';
 import 'package:nations_app/src/widgets/route_observer.dart';
+import 'package:nations_app/src/widgets/shimmer_effect.dart';
 import 'package:nations_app/src/widgets/show_bottom_modal.dart';
+import 'package:nations_app/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -156,8 +159,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: Row(
@@ -167,83 +171,97 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               'Explore',
               style: TextStyle(fontFamily: 'Pacifico', fontSize: 26),
             ),
-            Icon(Icons.wb_sunny_outlined),
+            GestureDetector(
+              onTap: () => themeProvider.toggleTheme(),
+              child: Icon(
+                themeProvider.isDarkMode
+                    ? Icons.nightlight_outlined
+                    : Icons.wb_sunny_outlined,
+              ),
+            ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            // SEARCH FIELD
-            TextField(
-              controller: _searchController,
-              onChanged: (value) => searchCountries(query: value),
-              onSubmitted: (value) => searchCountries(query: value),
-              decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                fillColor: Color.fromRGBO(242, 244, 247, 1),
-                filled: true,
-                prefixIcon: Icon(Icons.search),
-                hintText: '           Search Country',
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // RELOAD THE APP
-                GestureDetector(
-                  onTap: () {
-                    loadCountries();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.grey.shade300),
+      body:
+          _isLoading
+              ? ShimmerEffect()
+              : Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    // SEARCH FIELD
+                    TextField(
+                      controller: _searchController,
+                      onChanged: (value) => searchCountries(query: value),
+                      onSubmitted: (value) => searchCountries(query: value),
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).cardColor,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        ),
+                        fillColor: Theme.of(context).cardColor,
+                        filled: true,
+                        prefixIcon: Icon(Icons.search),
+                        hintText: '           Search Country',
+                      ),
                     ),
-                    child: Text('RESET'),
-                  ),
-                ),
-                // SHOWING THE BOTTOM MODAL FOR FILTERING
-                ShowBottomModal(
-                  onContinentSelected: _filterByContinent,
-                  onPopulationRangeSelected: (range) {
-                    _filterByPopulation(range['min']!, range['max']!);
-                  },
-                  onSizeRangeSelected: (sizeRange) {
-                    _filterBySize(sizeRange['min']!, sizeRange['max']!);
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // RELOAD THE APP
+                        GestureDetector(
+                          onTap: () {
+                            loadCountries();
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Text('RESET'),
+                          ),
+                        ),
+                        // SHOWING THE BOTTOM MODAL FOR FILTERING
+                        ShowBottomModal(
+                          onContinentSelected: _filterByContinent,
+                          onPopulationRangeSelected: (range) {
+                            _filterByPopulation(range['min']!, range['max']!);
+                          },
+                          onSizeRangeSelected: (sizeRange) {
+                            _filterBySize(sizeRange['min']!, sizeRange['max']!);
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
 
-            if (_isLoading)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: LinearProgressIndicator(),
-              ),
-            if (!_isLoading)
-              // THE COUNTRIES LIST MAIN BODY
-              Expanded(
-                child: BuildBody(
-                  filteredCountries: _filteredCountries,
-                  invalidSearchResult: invalidSearchResult,
-                  searchController: _searchController,
+                    if (_isLoading)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: LinearProgressIndicator(),
+                      ),
+                    if (!_isLoading)
+                      // THE COUNTRIES LIST MAIN BODY
+                      Expanded(
+                        child: BuildBody(
+                          filteredCountries: _filteredCountries,
+                          invalidSearchResult: invalidSearchResult,
+                          searchController: _searchController,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-          ],
-        ),
-      ),
     );
   }
 }

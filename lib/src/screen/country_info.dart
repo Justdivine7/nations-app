@@ -11,7 +11,7 @@ class CountryInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -89,7 +89,7 @@ class CountryInfo extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BuildRichText(title: 'Phone Code:', value: country.phoneCode),
+                  BuildRichText(title: 'Phone Code:', value: "+${country.phoneCode}"),
                   BuildRichText(title: 'Size:', value: country.size),
                   BuildRichText(
                     title: 'Description:',
